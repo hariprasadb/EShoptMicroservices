@@ -8,6 +8,20 @@ namespace Catalog.API.Products.UpdateProduct
     : ICommand<UpdateProductResult>;
 
     public record UpdateProductResult(bool IsSuccess);
+
+    public class UpdateCommandValidator : AbstractValidator<UpdateProductCommand>
+    {
+        public UpdateCommandValidator() {
+            RuleFor(command => command.Id).NotEmpty().WithMessage("Id is required");
+            RuleFor(command => command.Name).NotEmpty().WithMessage("Name is Required")
+                .Length(2, 150).WithMessage("Name must be between 2 and 150 characters");
+
+            RuleFor(command => command.Price).GreaterThan(0)
+                .WithMessage("Price must be greater than 0");
+
+        }
+
+    }
     internal class UpdateProductHandler(IDocumentSession session,
                                        ILogger<UpdateProductHandler> logger)
         : ICommandHandler<UpdateProductCommand, UpdateProductResult>
@@ -19,7 +33,7 @@ namespace Catalog.API.Products.UpdateProduct
             if (product == null)
             {
 
-                throw new ProductNotFoundException();
+                throw new ProductNotFoundException(command.Id);
             }
             product.Name = command.Name;
             product.Category = command.Category;    

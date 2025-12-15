@@ -1,5 +1,5 @@
 ﻿
-
+using Catalog.API.Products.GetProductByCategory;
 
 namespace Catalog.API.Products.CreateProduct
 {
@@ -10,21 +10,34 @@ namespace Catalog.API.Products.CreateProduct
 
     public record CreateProductResult(Guid Id);
 
-
-    internal class CreateProductCommandHandler(IDocumentSession session) : ICommandHandler<CreateProductCommand, CreateProductResult>
+    public class CreateProductCommandValidator :AbstractValidator<CreateProductCommand>
     {
-        public async Task<CreateProductResult> Handle(CreateProductCommand request, CancellationToken cancellationToken)
+        public CreateProductCommandValidator() 
+        {
+            RuleFor(x => x.Name).NotEmpty().WithMessage("Name is required");
+            RuleFor(x => x.Category).NotEmpty().WithMessage("Category is required");
+            RuleFor(x => x.ImageFile).NotEmpty().WithMessage("Image file is required");
+            RuleFor(x => x.Price).GreaterThan(0).WithMessage("Price must be greater than 0");
+
+        }
+    }
+
+    internal class CreateProductCommandHandler(IDocumentSession session, ILogger<GetProductByCategoryHandler> logger) : ICommandHandler<CreateProductCommand, CreateProductResult>
+    {
+        public async Task<CreateProductResult> Handle(CreateProductCommand command, CancellationToken cancellationToken)
         {
             //create a product entity
             //save to database
             //return createProductresult 
-           var product = new Product()
+
+            logger.LogInformation("CreateProductCommandHandler.Handle called with {@command}", command);
+            var product = new Product()
             { 
-                Name = request.Name,
-                Category = request.Category,
-                Description = request.Description,
-                ImageFile = request.ImageFile,
-                Price = request.Price
+                Name = command.Name,
+                Category = command.Category,
+                Description = command.Description,
+                ImageFile = command.ImageFile,
+                Price = command.Price
             };
             
             session.Store(product);
