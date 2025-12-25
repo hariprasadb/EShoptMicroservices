@@ -22,7 +22,7 @@ namespace Catalog.API.Products.CreateProduct
         }
     }
 
-    internal class CreateProductCommandHandler(IDocumentSession session, ILogger<GetProductByCategoryHandler> logger) : ICommandHandler<CreateProductCommand, CreateProductResult>
+    internal class CreateProductCommandHandler(IDocumentSession session) : ICommandHandler<CreateProductCommand, CreateProductResult>
     {
         public async Task<CreateProductResult> Handle(CreateProductCommand command, CancellationToken cancellationToken)
         {
@@ -30,7 +30,7 @@ namespace Catalog.API.Products.CreateProduct
             //save to database
             //return createProductresult 
 
-            logger.LogInformation("CreateProductCommandHandler.Handle called with {@command}", command);
+           // logger.LogInformation("CreateProductCommandHandler.Handle called with {@command}", command);
             var product = new Product()
             { 
                 Name = command.Name,
