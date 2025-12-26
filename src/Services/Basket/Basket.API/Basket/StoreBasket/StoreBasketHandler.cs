@@ -1,6 +1,7 @@
 ﻿
 
 using Basket.API.Data;
+using Dicount.Grpc;
 
 namespace Basket.API.Basket.StoreBasket
 {
@@ -16,19 +17,33 @@ namespace Basket.API.Basket.StoreBasket
             RuleFor(x => x.Cart.UserName).NotEmpty().WithMessage("User Name is required");
         }
     }
-    public class StoreBasketCommandHandler(IBasketRepository repository) : ICommandHandler<StoreBasketCommand, StoreBasketResult>
+    public class StoreBasketCommandHandler(IBasketRepository repository,
+         DiscountProtoService.DiscountProtoServiceClient discountProto
+
+        ) : ICommandHandler<StoreBasketCommand, StoreBasketResult>
     {
         public async Task<StoreBasketResult> Handle(StoreBasketCommand command, CancellationToken cancellationToken)
         {
             ShoppingCart cart = command.Cart;
 
-            //TODO :store basket in database and
-            // use Marten Upsert - if exist update, if not insert
-            //TODO : update the cache
-            await repository.StoreBasket(cart);
+            await DeductDiscount(cart);
+             // use Marten Upsert - if exist update, if not insert
+             await repository.StoreBasket(cart);
 
             return new StoreBasketResult(cart.UserName);
             
+        }
+        private async Task DeductDiscount(ShoppingCart cart)
+        {
+            foreach (var item in cart.Items)
+            {
+                var discountRequest = new GetDiscountRequest()
+                { ProductName = item.ProductName };
+
+                var coupon = await discountProto.GetDiscountAsync(discountRequest);
+                item.Price -= coupon.Amount;
+            }
+
         }
     }
 }
