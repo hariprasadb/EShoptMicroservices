@@ -13,7 +13,7 @@ namespace Ordering.Domain.ValueObjects
             {
                 throw new DomainException("OrderItemId cannot be empty");
             }
-            return OrderItemId.Of(value);
+            return new OrderItemId(value);
         }
     }
 }

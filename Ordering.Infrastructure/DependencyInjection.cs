@@ -1,23 +1,30 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Ordering.Application.Data;
+
+
 
 namespace Ordering.Infrastructure
 {
-    internal static class DependencyInjection
+    public static class DependencyInjection
     {
         public static IServiceCollection AddInfrastructureServices
-            (this IServiceCollection services,IConfiguration configuration)
+            (this IServiceCollection services, IConfiguration configuration)
         {
+            var connectionString = configuration.GetConnectionString("Database");
+
+            services.AddScoped<ISaveChangesInterceptor,AuditableEntityInterceptor>();
+            services.AddScoped<ISaveChangesInterceptor,DispatchDomainEventsInterceptor>();
+
             //Add Services to the container.
-            //services.AddDbContext<ApplicationDBContext>(options=>
-            //options.UseSqlServer(connectionString));
-            
-            //services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
+            services.AddDbContext<ApplicationDBContext>((serviceProvider,options) =>
+            {
+                options.AddInterceptors(serviceProvider.GetServices<ISaveChangesInterceptor>());
+                options.UseSqlServer(connectionString);
+            });
+
+            services.AddScoped<IApplicationDBContext, ApplicationDBContext>();
 
             return services;
         }

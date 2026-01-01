@@ -9,13 +9,13 @@ namespace Ordering.Domain.Abstractions
     public class Aggregate<TId> : Entity<TId>, IAggregate<TId>
     {
         private readonly List<IDomainEvent> _domainEvents = new();
-        public IReadOnlyList<IDomainEvent> DomainEvents => throw new NotImplementedException();
+        public IReadOnlyList<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
 
         public void AddDomainEvent(IDomainEvent domainEvent)
         {
             _domainEvents.Add(domainEvent);
         }
-        public IDomainEvent[] clearDomainEvents()
+        public IDomainEvent[] ClearDomainEvents()
         {
             IDomainEvent[] domainEvents = _domainEvents.ToArray();
             _domainEvents.Clear();
