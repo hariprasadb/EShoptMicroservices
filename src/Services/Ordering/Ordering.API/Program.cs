@@ -9,9 +9,10 @@ var builder = WebApplication.CreateBuilder(args);
 //Infrastructure - EF Core 
 //Application MediatR
 ////API - Carter , HealthChecks
-builder.Services.AddApplicationServices()
+builder.Services.AddApplicationServices(builder.Configuration)
    .AddInfrastructureServices(builder.Configuration)
-   .AddApiServices();
+   .AddApiServices(builder.Configuration);
+
 
 
 
@@ -25,3 +26,4 @@ if (app.Environment.IsDevelopment())
 //app.MapGet("/", () => "Hello World!");
 
 app.Run();
+//docker-compose -f docker-compose.yml -f docker-compose.override.yml up -d 

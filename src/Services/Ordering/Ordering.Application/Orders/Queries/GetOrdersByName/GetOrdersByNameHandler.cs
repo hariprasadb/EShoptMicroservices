@@ -19,7 +19,7 @@ namespace Ordering.Application.Orders.Queries.GetOrdersByName
             var orders = await dbContext.Orders.Include(O => O.OrderItems)
                                 .AsNoTracking()
                                 .Where(O => O.OrderName.Value.Contains(query.Name))
-                                .OrderBy(O => O.OrderName)
+                                .OrderBy(O => O.OrderName.Value)
                                 .ToListAsync(cancellationToken);
             var orderDtos = orders.ToOrderDtoList();
             return new GetOrdersByNameResult(orderDtos);

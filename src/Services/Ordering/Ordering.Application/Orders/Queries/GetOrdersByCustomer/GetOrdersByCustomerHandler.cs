@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using BuildingBlocks.Exceptions;
+using Microsoft.EntityFrameworkCore;
 using Ordering.Application.Extensions;
 using System;
 using System.Collections.Generic;
@@ -22,7 +23,7 @@ namespace Ordering.Application.Orders.Queries.GetOrdersByCustomer
                             .Where(O => O.CustomerId == CustomerId.Of(request.CustomerId))
                             .OrderBy(O => O.OrderName.Value)
                             .ToListAsync();
-
+            if (orders.Count == 0) throw new NotFoundException("Customer record not found exception");
             return new GetOrdersByCustomerResult(orders.ToOrderDtoList());
         }
     }

@@ -17,7 +17,7 @@ namespace Ordering.Application.Orders.Queries.GetOrders
             var pageIndex = query.PaginationRequest.PageIndex;
             var pageSize = query.PaginationRequest.PageSize;
 
-            var totalCount = await dbContext.OrderItems.LongCountAsync(cancellationToken);
+            var totalCount = await dbContext.Orders.LongCountAsync(cancellationToken);
             var orders = await dbContext.Orders.Include(O => O.OrderItems)
                             .OrderBy(O => O.OrderName.Value)
                             .Skip(pageSize * pageIndex)

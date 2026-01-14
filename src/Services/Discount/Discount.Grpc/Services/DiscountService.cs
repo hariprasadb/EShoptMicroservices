@@ -45,14 +45,16 @@ namespace Discount.Grpc.Services
         {
             var coupon = await dbcontext.Coupons.Where(r => r.ProductName == request.ProductName)
                           .FirstOrDefaultAsync();
-            if (coupon == null)
-            {
-                coupon = new() { Id = 0, Amount = 0, Description = "No Discount" };
-            }
-            logger.LogInformation("Discount is retrived for Product : {prductName}, Amount: {amount}",
-                coupon.ProductName, coupon.Amount);
-            var couponModel = coupon.Adapt<CouponModel>();
-            return couponModel;
+           
+                if (coupon == null)
+                {
+                    coupon = new() { Id = 0, Amount = 0, Description = "No Discount",ProductName= request.ProductName };
+                }
+                logger.LogInformation("Discount is retrived for Product : {prductName}, Amount: {amount}",
+                    coupon.ProductName, coupon.Amount);
+                var couponModel = coupon.Adapt<CouponModel>();
+                return couponModel;
+            
 
         }
         public async override Task<CouponModel> UpdateDiscount(UpdateDiscountRequest request, ServerCallContext context)

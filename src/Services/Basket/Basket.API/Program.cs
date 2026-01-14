@@ -2,6 +2,7 @@
 
 using Basket.API.Data;
 using BuildingBlocks.Exceptions.Handler;
+using BuildingBlocks.Messaging.MassTransit;
 using Dicount.Grpc;
 using HealthChecks.UI.Client;
 using Marten;
@@ -21,6 +22,7 @@ builder.Services.AddMediatR((configuration) =>
 }
 );
 
+
 //Add data services
 builder.Services.AddMarten(options =>
 {
@@ -29,8 +31,8 @@ builder.Services.AddMarten(options =>
 }).UseLightweightSessions();
 builder.Services.AddScoped<IBasketRepository, BasketRepository>();
 builder.Services.Decorate<IBasketRepository, CachedBasketRepository>();
-builder.Services.AddScoped<IBasketRepository, BasketRepository>();
-builder.Services.Decorate<IBasketRepository, CachedBasketRepository>();
+//builder.Services.AddScoped<IBasketRepository, BasketRepository>();
+//builder.Services.Decorate<IBasketRepository, CachedBasketRepository>();
 builder.Services.AddStackExchangeRedisCache((options =>
 {
     options.Configuration = builder.Configuration.GetConnectionString("Redis");
@@ -57,7 +59,7 @@ builder.Services.AddGrpcClient<DiscountProtoService.DiscountProtoServiceClient>(
     };
     return handler;
 });
-
+builder.Services.AddMessageBroker(builder.Configuration);
 
  //Add Cross cutting services
 builder.Services.AddExceptionHandler<CustomExceptionHandler>();
